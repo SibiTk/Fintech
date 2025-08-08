@@ -1,0 +1,281 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Account API
+    version: 0.0.1
+paths:
+    /v1/account:
+        post:
+            tags:
+                - Account
+            description: Create a new account
+            operationId: Account_CreateAccount
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AccountRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AccountReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/account/{accountId}:
+        get:
+            tags:
+                - Account
+            description: Get account by account ID
+            operationId: Account_GetAccountWithId
+            parameters:
+                - name: accountId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AccountIdReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/account/{customerId}:
+        get:
+            tags:
+                - Account
+            description: Get all accounts by customer ID
+            operationId: Account_GetCustomerWithId
+            parameters:
+                - name: customerId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetCustomerWithIdReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - Account
+            description: Delete account by customer ID
+            operationId: Account_DeleteAccount
+            parameters:
+                - name: customerId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - Account
+            description: Update account by customer ID
+            operationId: Account_UpdateAccount
+            parameters:
+                - name: customerId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        AccountIdReply:
+            type: object
+            properties:
+                accounts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AccountReply'
+        AccountReply:
+            type: object
+            properties:
+                accountId:
+                    type: string
+                customerId:
+                    type: string
+                accountNumber:
+                    type: string
+                accountType:
+                    type: string
+                currency:
+                    type: string
+                status:
+                    type: string
+                availableBalance:
+                    type: string
+                pendingBalance:
+                    type: string
+                creditLimit:
+                    type: string
+                lastTransactionAt:
+                    type: string
+                message:
+                    type: string
+            description: Account Response
+        AccountRequest:
+            type: object
+            properties:
+                accountId:
+                    type: string
+                customerId:
+                    type: string
+                accountNumber:
+                    type: string
+                accountType:
+                    type: string
+                currency:
+                    type: string
+                status:
+                    type: string
+                availableBalance:
+                    type: string
+                pendingBalance:
+                    type: string
+                creditLimit:
+                    type: string
+                lastTransactionAt:
+                    type: string
+            description: Create Account
+        DeleteReply:
+            type: object
+            properties:
+                message:
+                    type: string
+        GetCustomerWithIdReply:
+            type: object
+            properties:
+                accounts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AccountReply'
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        UpdateReply:
+            type: object
+            properties:
+                accountId:
+                    type: string
+                customerId:
+                    type: string
+                accountNumber:
+                    type: string
+                accountType:
+                    type: string
+                currency:
+                    type: string
+                status:
+                    type: string
+                availableBalance:
+                    type: string
+                pendingBalance:
+                    type: string
+                creditLimit:
+                    type: string
+                lastTransactionAt:
+                    type: string
+                message:
+                    type: string
+        UpdateRequest:
+            type: object
+            properties:
+                accountId:
+                    type: string
+                customerId:
+                    type: string
+                accountNumber:
+                    type: string
+                accountType:
+                    type: string
+                currency:
+                    type: string
+                status:
+                    type: string
+                availableBalance:
+                    type: string
+                pendingBalance:
+                    type: string
+                creditLimit:
+                    type: string
+            description: Update Account
+tags:
+    - name: Account

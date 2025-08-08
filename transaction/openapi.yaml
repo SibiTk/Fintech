@@ -1,0 +1,233 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Card API
+    version: 0.0.1
+paths:
+    /v1/helloworld/transaction:
+        post:
+            tags:
+                - Card
+            description: Transaction endpoints
+            operationId: Card_CreateTransaction
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateTransactionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateTransactionReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/helloworld/transaction/{transactionId}:
+        get:
+            tags:
+                - Card
+            operationId: Card_DisplayTransaction
+            parameters:
+                - name: transactionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FindTransactionByIdReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - Card
+            operationId: Card_DeleteTransaction
+            parameters:
+                - name: transactionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteTransactionReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - Card
+            operationId: Card_UpdateTransaction
+            parameters:
+                - name: transactionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateTransactionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateTransactionReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        CreateTransactionReply:
+            type: object
+            properties:
+                message:
+                    type: string
+                transactionId:
+                    type: string
+                accountId:
+                    type: string
+                relatedTransactionId:
+                    type: string
+                transactionType:
+                    type: string
+                amount:
+                    type: number
+                    format: double
+                currency:
+                    type: string
+                status:
+                    type: string
+                description:
+                    type: string
+                referenceNumber:
+                    type: string
+                postingDate:
+                    type: string
+        CreateTransactionRequest:
+            type: object
+            properties:
+                transactionid:
+                    type: string
+                accountId:
+                    type: string
+                relatedTransactionId:
+                    type: string
+                transactionType:
+                    type: string
+                amount:
+                    type: number
+                    format: double
+                currency:
+                    type: string
+                status:
+                    type: string
+                description:
+                    type: string
+                referenceNumber:
+                    type: string
+                postingDate:
+                    type: string
+            description: Transaction messages
+        DeleteTransactionReply:
+            type: object
+            properties:
+                message:
+                    type: string
+        FindTransactionByIdReply:
+            type: object
+            properties:
+                display:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CreateTransactionReply'
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        UpdateTransactionReply:
+            type: object
+            properties:
+                message:
+                    type: string
+                display:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CreateTransactionReply'
+        UpdateTransactionRequest:
+            type: object
+            properties:
+                transactionId:
+                    type: string
+                accountId:
+                    type: string
+                relatedTransactionId:
+                    type: string
+                transactionType:
+                    type: string
+                amount:
+                    type: number
+                    format: double
+                currency:
+                    type: string
+                status:
+                    type: string
+                description:
+                    type: string
+                referenceNumber:
+                    type: string
+                postingDate:
+                    type: string
+tags:
+    - name: Card

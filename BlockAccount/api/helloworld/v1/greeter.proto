@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package helloworld.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "BlockAccount/api/helloworld/v1;v1";  
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.helloworld.v1";
+option java_outer_classname = "HelloworldProtoV1";
+
+// The greeting service definition.
+service AccountBlockService {
+  rpc SaveAccBlock (SaveAccBlockRequest) returns (SaveAccBlockReply) {
+    option (google.api.http) = {
+      post: "/v1/SaveAccBlock"
+      body: "*"
+    };
+  };
+
+  rpc GetAccBlock (GetAccBlockRequest) returns (GetAccBlockReply) {
+    option (google.api.http) = {
+      get: "/v1/GetAccBlock/{customer_id}"
+    };
+  };
+
+  rpc UpdateAccBlock (UpdateAccBlockRequest) returns (UpdateAccBlockReply) {
+    option (google.api.http) = {
+      put: "/v1/UpdateAccBlock/{customer_id}"
+      body: "*"
+    };
+  };
+}
+
+
+message SaveAccBlockRequest {
+  int64 customer_id = 1;
+  string description = 2;
+  string source = 3;
+  string status = 4;
+}
+
+
+message SaveAccBlockReply {
+  int64 customer_id = 1;
+  string description = 2;
+  string message = 3;       
+  string source = 4;
+  string status = 5;
+}
+
+message GetAccBlockRequest {
+  int64 customer_id = 1;
+}
+
+
+message GetAccBlockReply {
+  int64 customer_id = 1;
+  string description = 2;
+  string source = 4;
+  string status = 5;
+}
+
+
+message UpdateAccBlockRequest {
+  int64 customer_id = 1;
+  string description = 2;
+  string source = 3;        
+  string status = 4;         
+}
+
+
+message UpdateAccBlockReply {
+  int64 customer_id = 1;
+  string description = 2;
+  string message = 3;       
+  string source = 4;
+  string status = 5;
+}

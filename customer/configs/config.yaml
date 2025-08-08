@@ -1,0 +1,15 @@
+server:
+  http:
+    addr: 0.0.0.0:8022
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:9022
+    timeout: 1s
+data:
+  database:
+    driver: postgres
+    source: postgres://sibi.t:1323@localhost:5432/fintech?sslmode=disable
+  redis:
+    addr: 127.0.0.1:6379
+    read_timeout: 0.2s
+    write_timeout: 0.2s

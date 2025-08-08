@@ -1,0 +1,135 @@
+package service
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	v1 "payment/api/helloworld/v1"
+	"payment/internal/biz"
+	//"payment/internal/client"
+
+	accountpb "account/api/helloworld/v1"
+	cu "customer/api/helloworld/v1"
+
+	"github.com/nats-io/nats.go"
+)
+
+type PaymentService struct {
+	AccountClient  accountpb.AccountClient
+	CustomerClient cu.CustomerManagerClient
+	v1.UnimplementedPaymentServer
+	uc *biz.PaymentUsecase
+}
+
+type PaymentStatus struct {
+	FromEmail     string
+	ToEmail       string
+	FromBalance   int64
+	ToBalance     int64
+	FromFirstName string
+	ToFirstName   string
+	Amount        int64
+	AccountNumber int64
+}
+
+func NewPaymentService(uc *biz.PaymentUsecase, accClient accountpb.AccountClient, cusClient cu.CustomerManagerClient) *PaymentService {
+	return &PaymentService{uc: uc, AccountClient: accClient, CustomerClient: cusClient}
+}
+
+func connectToNats() (*nats.Conn, error) {
+	return nats.Connect(nats.DefaultURL)
+}
+
+func (s *PaymentService) CreatePayment(ctx context.Context, req *v1.CreatePaymentRequest) (*v1.CreatePaymentReply, error) {
+	payment := &biz.Payment{
+		PaymentId:         req.PaymentId,
+		FromAccountId:     req.FromAccountId,
+		ToAccountId:       req.ToAccountId,
+		PaymentType:       req.PaymentType,
+		Amount:            int64(req.Amount),
+		Currency:          req.Currency,
+		Status:            req.Status,
+		PaymentMethod:     req.PaymentMethod,
+		ReferenceNumber:   req.ReferenceNumber,
+		ExternalReference: req.ExternalReference,
+	}
+
+	p, err := s.uc.CreatePayment(ctx, payment)
+	if err != nil {
+		return nil, err
+	}
+
+	fromResp, err := s.AccountClient.GetAccountWithId(ctx, &accountpb.AccountIdRequest{AccountId: req.FromAccountId})
+	if err != nil {
+		log.Println("Invalid FromAccount")
+		return nil, err
+	}
+	if len(fromResp.Accounts) == 0 {
+		return nil, fmt.Errorf("no account found for FromAccountId: %v", req.FromAccountId)
+	}
+	fromAcc := fromResp.Accounts[0]
+
+	toResp, err := s.AccountClient.GetAccountWithId(ctx, &accountpb.AccountIdRequest{AccountId: req.ToAccountId})
+	if err != nil {
+		log.Println("Invalid ToAccount")
+		return nil, err
+	}
+	if len(toResp.Accounts) == 0 {
+		return nil, fmt.Errorf("no account found for ToAccountId: %v", req.ToAccountId)
+	}
+	toAcc := toResp.Accounts[0]
+
+	if fromAcc.AvailableBalance < int64(req.Amount) {
+		return nil, fmt.Errorf("insufficient funds in the from account")
+	}
+
+	newFromBalance := fromAcc.AvailableBalance - int64(req.Amount)
+	newToBalance := toAcc.AvailableBalance + int64(req.Amount)
+    fmt.Println("New From balance : ",newFromBalance)
+	 fmt.Println("New To balance : ",newToBalance)
+	_, err = s.AccountClient.UpdateAccount(ctx, &accountpb.UpdateRequest{
+		CustomerId: fromAcc.CustomerId,
+		AccountType: fromAcc.AccountType,
+		Status: fromAcc.Status,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.AccountClient.UpdateAccount(ctx, &accountpb.UpdateRequest{
+		CustomerId: toAcc.CustomerId,
+		AccountType: toAcc.AccountType,
+		Status: toAcc.Status,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	fromCus, err := s.CustomerClient.DisplayCustomer(ctx, &cu.FindCustomerByIdRequest{CustomerId: fromAcc.CustomerId})
+	if err != nil {
+		return nil, err
+	}
+
+	toCus, err := s.CustomerClient.DisplayCustomer(ctx, &cu.FindCustomerByIdRequest{CustomerId: toAcc.CustomerId})
+	if err != nil {
+		return nil, err
+	}
+
+	_ = fromCus
+	_ = toCus
+
+	return &v1.CreatePaymentReply{
+		PaymentId:         p.PaymentId,
+		FromAccountId:     p.FromAccountId,
+		ToAccountId:       p.ToAccountId,
+		PaymentType:       p.PaymentType,
+		Amount:            float64(p.Amount),
+		Currency:          p.Currency,
+		Status:            p.Status,
+		PaymentMethod:     p.PaymentMethod,
+		ReferenceNumber:   p.ReferenceNumber,
+		ExternalReference: p.ExternalReference,
+		Message:           "Payment Details are stored",
+	}, nil
+}

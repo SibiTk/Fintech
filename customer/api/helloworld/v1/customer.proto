@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package customermanager.v1;
+
+
+import "google/api/annotations.proto";
+
+
+option go_package = "customermanager/api/customermanager/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.customermanager.v1";
+option java_outer_classname = "CustomerManagerProtoV1";
+
+service CustomerManager {
+  // Customer endpoints
+  rpc CreateCustomer (CreateCustomerRequest) returns (CreateCustomerReply) {
+    option (google.api.http) = {
+      post: "/v1/customers"
+      body: "*"
+    };
+  }
+  rpc UpdateCustomer (UpdateCustomerRequest) returns (UpdateCustomerReply) {
+    option (google.api.http) = {
+
+      body: "*"
+    };
+  }
+  rpc DeleteCustomer (DeleteCustomerRequest) returns (DeleteCustomerReply) {
+    option (google.api.http) = {
+      delete: "/v1/customers/{customer_id}"
+    };
+  }
+  rpc DisplayCustomer (FindCustomerByIdRequest) returns (FindCustomerByIdReply) {
+    option (google.api.http) = {
+      get: "/v1/customers/number/{customer_id}"
+    };
+  }
+ 
+  // rpc GetCustomerWithId (GetCustomerWithIdRequest) returns (GetCustomerWithIdReply) {
+  //   option (google.api.http) = {
+  //     get: "/v1/customers/{customer_id}"
+  //   };
+  }
+
+
+// Customer messages
+message CreateCustomerRequest {
+  int64 customer_id = 1;
+  string customer_number = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string email = 5;
+  string phone = 6;
+  string date_of_birth = 7;
+  string status = 8;
+  string kyc_status = 9;
+}
+
+message CreateCustomerReply {
+  string message = 1;
+  int64 customer_id = 2;
+  string customer_number = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string email = 6;
+  string phone = 7;
+  string date_of_birth = 8;
+  string status = 9;
+  string kyc_status = 10;
+}
+
+message UpdateCustomerRequest {
+  int64 customer_id = 1;
+  string customer_number = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string email = 5;
+  string phone = 6;
+  string date_of_birth = 7;
+  string status = 8;
+  string kyc_status = 9;
+}
+
+message AccountDetails {
+  int64 account_id = 1;
+  int64 customer_id = 2;
+  int64 account_number = 3;
+  string account_type = 4;
+  string currency = 5;
+  string status = 6;
+  int64 available_balance = 7;
+  int64 pending_balance = 8;
+  string credit_limit = 9;
+  string last_transaction_at = 10;
+}
+
+
+message UpdateCustomerReply {
+  string message = 1;
+  repeated CreateCustomerReply display = 2;
+}
+
+message DeleteCustomerRequest {
+  int64 customer_id = 1;
+}
+
+message DeleteCustomerReply {
+  string message = 1;
+}
+
+message FindCustomerByIdRequest {
+  int64 customer_id = 1;
+}
+
+message FindCustomerByIdReply {
+  repeated CreateCustomerReply display = 1;
+  repeated AccountDetails acc =2;
+}
+

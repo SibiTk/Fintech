@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package helloworld.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "accountservice/api/helloworld/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.helloworld.v1";
+option java_outer_classname = "HelloworldProtoV1";
+
+
+
+service Account {
+  
+  // Create a new account
+  rpc CreateAccount (AccountRequest) returns (AccountReply) {
+    option (google.api.http) = {
+      post: "/v1/account"
+      body: "*"
+    };
+  }
+
+  // Update account by customer ID
+  rpc UpdateAccount (UpdateRequest) returns (UpdateReply) {
+    option (google.api.http) = {
+      patch: "/v1/account/{customerId}"
+      body: "*"
+    };
+  }
+
+  // Delete account by customer ID
+  rpc DeleteAccount (DeleteRequest) returns (DeleteReply) {
+    option (google.api.http) = {
+      delete: "/v1/account/{customerId}"
+    };
+  }
+
+  // Get all accounts by customer ID
+  rpc GetCustomerWithId (GetCustomerWithIdRequest) returns (GetCustomerWithIdReply) {
+    option (google.api.http) = {
+      get: "/v1/account/{customerId}"
+    };
+  }
+
+  // Get account by account ID
+  rpc GetAccountWithId (AccountIdRequest) returns (AccountIdReply) {
+    option (google.api.http) = {
+      get: "/v1/account/{accountId}"
+    };
+  }
+}
+
+// Create Account
+message AccountRequest {
+  int64 accountId = 1;
+  int64 customerId = 2;
+  int64 accountNumber = 3;
+  string accountType = 4;
+  string currency = 5;
+  string status = 6;
+  int64 availableBalance = 7;
+  int64 pendingBalance = 8;
+  string creditLimit = 9;
+  string lastTransactionAt = 12;
+}
+
+// Account Response
+message AccountReply {
+  int64 accountId = 1;
+  int64 customerId = 2;
+  int64 accountNumber = 3;
+  string accountType = 4;
+  string currency = 5;
+  string status = 6;
+  int64 availableBalance = 7;  
+  int64 pendingBalance = 8;
+  string creditLimit = 9;
+  string lastTransactionAt = 12;
+  string message = 13;
+}
+
+// Update Account
+message UpdateRequest {
+  int64 accountId = 1;
+  int64 customerId = 2;
+  int64 accountNumber = 3;
+  string accountType = 4;
+  string currency = 5;
+  string status = 6;
+  int64 availableBalance = 7;
+  int64 pendingBalance = 8;
+  string creditLimit = 9;
+}
+
+message UpdateReply {
+ int64 accountId = 1;
+  int64 customerId = 2;
+  int64 accountNumber = 3;
+  string accountType = 4;
+  string currency = 5;
+  string status = 6;
+  int64 availableBalance = 7;  
+  int64 pendingBalance = 8;
+  string creditLimit = 9;
+  string lastTransactionAt = 12;
+  string message = 13;
+}
+
+// Delete Account
+message DeleteRequest {
+  int64 customerId = 1;
+}
+
+message DeleteReply {
+  string message = 1;
+}
+
+// Get accounts by customerId
+message GetCustomerWithIdRequest {
+  int64 customerId = 1;
+}
+
+message GetCustomerWithIdReply {
+  repeated AccountReply accounts = 1;
+}
+
+// Get accounts by accountId
+message AccountIdRequest{
+  int64 accountId = 1;
+}
+
+message AccountIdReply{
+  repeated AccountReply accounts = 1;
+}
+

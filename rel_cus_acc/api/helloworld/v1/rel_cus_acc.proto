@@ -1,0 +1,216 @@
+syntax = "proto3";
+
+package helloworld.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "relcusacc/api/helloworld/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.helloworld.v1";
+option java_outer_classname = "RelCusAccProtoV1";
+
+service RelCusAcc {
+  // Create a new customer-account relationship
+  rpc CreateRelation (CreateRelationRequest) returns (CreateRelationReply) {
+    option (google.api.http) = {
+      post: "/v1/rel-cus-acc"
+      body: "*"
+    };
+  }
+
+  // Update customer-account relationship
+  rpc UpdateRelation (UpdateRelationRequest) returns (UpdateRelationReply) {
+    option (google.api.http) = {
+      patch: "/v1/rel-cus-acc/{id}"
+      body: "*"
+    };
+  }
+
+  // Delete relationship by ID
+  rpc DeleteRelation (DeleteRelationRequest) returns (DeleteRelationReply) {
+    option (google.api.http) = {
+      delete: "/v1/rel-cus-acc/{id}"
+    };
+  }
+
+  // Get all relationships by customer ID
+  rpc GetRelationsByCustomer (GetRelationsByCustomerRequest) returns (GetRelationsByCustomerReply) {
+    option (google.api.http) = {
+      get: "/v1/rel-cus-acc/customer/{customerId}"
+    };
+  }
+
+  // Get relationship by account ID
+  rpc GetRelationByAccount (GetRelationByAccountRequest) returns (GetRelationByAccountReply) {
+    option (google.api.http) = {
+      get: "/v1/rel-cus-acc/account/{accountId}"
+    };
+  }
+
+
+  // Get all relationships
+  rpc GetAllRelations (GetAllRelationsRequest) returns (GetAllRelationsReply) {
+    option (google.api.http) = {
+      get: "/v1/rel-cus-acc"
+    };
+  }
+}
+
+
+message CreateRelationRequest {
+  int64 customerId = 1;
+  string customerNumber = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string email = 5;
+  string phone = 6;
+  string dateOfBirth = 7;
+  string customerStatus = 8;
+  string kycStatus = 9;
+  string customerCreatedAt = 10;
+  string customerUpdatedAt = 11;
+  int64 accountId = 12;
+  string accountNumber = 13;
+  string accountType = 14;
+  string currency = 15;
+  string accountStatus = 16;
+  int64 availableBalance = 17;
+  int64 pendingBalance = 18;
+  string creditLimit = 19;
+  string lastTransactionAt = 20;
+  string accountCreatedAt = 21;
+  string lastUsedAt = 22;
+}
+
+
+message RelationReply {
+  int64 id = 1;
+  int64 customerId = 2;
+  string customerNumber = 3;
+  string firstName = 4;
+  string lastName = 5;
+  string email = 6;
+  string phone = 7;
+  string dateOfBirth = 8;
+  string customerStatus = 9;
+  string kycStatus = 10;
+  string customerCreatedAt = 11;
+  string customerUpdatedAt = 12;
+  int64 accountId = 13;
+  string accountNumber = 14;
+  string accountType = 15;
+  string currency = 16;
+  string accountStatus = 17;
+  int64 availableBalance = 18;
+  int64 pendingBalance = 19;
+  string creditLimit = 20;
+  string lastTransactionAt = 21;
+  string accountCreatedAt = 22;
+  string lastUsedAt = 23;
+}
+
+
+message CreateRelationReply {
+  int64 id = 1;
+  int64 customerId = 2;
+  string customerNumber = 3;
+  string firstName = 4;
+  string lastName = 5;
+  string email = 6;
+  string phone = 7;
+  string dateOfBirth = 8;
+  string customerStatus = 9;
+  string kycStatus = 10;
+  string customerCreatedAt = 11;
+  string customerUpdatedAt = 12;
+  int64 accountId = 13;
+  string accountNumber = 14;
+  string accountType = 15;
+  string currency = 16;
+  string accountStatus = 17;
+  int64 availableBalance = 18;
+  int64 pendingBalance = 19;
+  string creditLimit = 20;
+  string lastTransactionAt = 21;
+  string accountCreatedAt = 22;
+  string lastUsedAt = 23;
+  string message = 24;
+}
+
+
+message UpdateRelationRequest {
+  int64 id = 1;
+  int64 customerId = 2;
+  string customerNumber = 3;
+  string firstName = 4;
+  string lastName = 5;
+  string email = 6;
+  string phone = 7;
+  string dateOfBirth = 8;
+  string customerStatus = 9;
+  string kycStatus = 10;
+  string customerUpdatedAt = 11;
+  int64 accountId = 12;
+  string accountNumber = 13;
+  string accountType = 14;
+  string currency = 15;
+  string accountStatus = 16;
+  int64 availableBalance = 17;
+  int64 pendingBalance = 18;
+  string creditLimit = 19;
+  string lastTransactionAt = 20;
+  string lastUsedAt = 21;
+}
+
+
+message UpdateRelationReply {
+  string message = 1;
+  repeated RelationReply relations = 2;
+}
+
+message DeleteRelationRequest {
+  int64 id = 1;
+}
+
+message DeleteRelationReply {
+  string message = 1;
+}
+
+
+message GetRelationsByCustomerRequest {
+  int64 customerId = 1;
+}
+
+message GetRelationsByCustomerReply {
+  repeated RelationReply relations = 1;
+}
+
+message GetRelationByAccountRequest {
+  int64 accountId = 1;
+}
+
+message GetRelationByAccountReply {
+  RelationReply relation = 1;
+}
+
+
+message GetRelationByIdRequest {
+  int64 id = 1;
+}
+
+message GetRelationByIdReply {
+  RelationReply relation = 1;
+}
+
+message GetAllRelationsRequest {
+
+  int32 page = 1;
+  int32 pageSize = 2;
+}
+
+message GetAllRelationsReply {
+  repeated RelationReply relations = 1;
+  int32 totalCount = 2;
+  int32 currentPage = 3;
+  int32 totalPages = 4;
+}

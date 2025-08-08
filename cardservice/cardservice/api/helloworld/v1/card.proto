@@ -1,0 +1,89 @@
+syntax = "proto3";
+package helloworld.v1;
+import "google/api/annotations.proto";
+option go_package = "cardservice/api/helloworld/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.helloworld.v1";
+option java_outer_classname = "HelloworldProtoV1";
+
+service Card {
+  rpc CreateCard (CreateRequest) returns (CreateReply) {
+    option (google.api.http) = {
+      post: "/v1/helloworld/card";
+      body:"*";
+    };
+  }
+  rpc UpdateCard(UpdateCardRequest)returns(UpdateCardReply){
+    option (google.api.http)={
+          patch:"/v1/helloworld/card/{cardId}";
+          body:"*"
+    };
+  }
+  rpc DeleteCard(DeleteCardRequest)returns(DeleteCardReply){
+    option (google.api.http)={
+      delete:"/v1/helloworld/card/{cardId}"
+    };
+  }
+  rpc DisplayCard(FindByIdRequest)returns(FindByIdReply){
+    option (google.api.http)={
+      get:"/v1/helloworld/card/{cardId}"
+    };
+  }
+}
+
+
+message CreateRequest {
+  int64 cardId=1;
+  int64 accountId=2;
+  string cardnumber=3;
+  string cardtype=4;
+  string expirydate=5;
+  int64 dailylimit=6;
+  int64 monthlylimit=7;
+  int64 pinattempts=8;
+}
+
+
+message CreateReply {
+  string message = 9;
+  int64 cardId=1;
+  int64 accountId=2;
+  string cardnumber=3;
+  string cardtype=4;
+  string expirydate=5;
+  int64 dailylimit=6;
+  int64 monthlylimit=7;
+  int64 pinattempts=8;
+}
+
+message UpdateCardRequest{
+  int64 cardId=1;
+  int64 accountId=2;
+  string cardnumber=3;
+  string cardtype=4;
+  int64 dailylimit=6;
+  int64 monthlylimit=7;
+}
+message UpdateCardReply{
+  string message = 1;
+  repeated CreateReply display=2;
+
+}
+
+message DeleteCardRequest{
+int64 cardId=1;
+int64 accountId=2;
+}
+message DeleteCardReply{
+string message=1;
+}
+
+message FindByIdRequest{
+int64 cardId=1;
+}
+message FindByIdReply{
+repeated CreateReply display=1;
+}
+
+
+
