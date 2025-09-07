@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"message-service/internal/biz"
-
+"fmt"
 	"github.com/go-kratos/kratos/v2/log"
 )
 
@@ -21,26 +21,14 @@ func NewGreeterRepo(data *Data, logger log.Logger) biz.GreeterRepo {
 	}
 }
 
-func (r *greeterRepo) Save(ctx context.Context, g *biz.Notification) (*biz.Notification, error) {
-	return g, nil
-}
 
-func (r *greeterRepo) Update(ctx context.Context, g *biz.Notification) (*biz.Notification, error) {
-	return g, nil
-}
-
-func (r *greeterRepo) FindByID(context.Context, int64) (*biz.Notification, error) {
-	return nil, nil
-}
-
-func (r *greeterRepo) ListByHello(context.Context, string) ([]*biz.Notification, error) {
-	return nil, nil
-}
-
-func (r *greeterRepo) ListAll(context.Context) ([]*biz.Notification, error) {
-	return nil, nil
-}
 func (r *greeterRepo) PaymentNotification(ctx context.Context,g *biz.Payment) (*biz.Payment, error) {
 	return nil, nil
+}
+
+func (r *greeterRepo) CreateNotification(ctx context.Context, g *biz.Notification) (*biz.Notification, error) {
+r.log.WithContext(ctx).Infof("Saving email to repo: %s", g.Email)
+fmt.Println("Email id id:",g.Email)
+	return g, nil
 }
 

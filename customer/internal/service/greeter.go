@@ -10,7 +10,7 @@ import (
 	"customer/internal/biz"
 	"customer/internal/handler"
 
-	//"strconv"
+
 	"github.com/nats-io/nats.go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -23,14 +23,11 @@ type CustomerManagerService struct {
 	v1.UnimplementedCustomerManagerServer
 	uc *biz.CustomerUsecase
 }
-// func parseCustomerID(id string) int64 {
-//     custID, _ := strconv.ParseInt(id, 10, 64)
-//     return custID
-// }
+
 type Message1 struct{
 	CustomerNumber string
 	FirstName string
-	Email string
+	Email string `json:"email"`
 	status string
 
 }
@@ -45,7 +42,7 @@ func NewCustomerManagerService(uc *biz.CustomerUsecase) *CustomerManagerService 
 }
 
 func (s *CustomerManagerService) CreateCustomer(ctx context.Context, req *v1.CreateCustomerRequest) (*v1.CreateCustomerReply, error) {
-	// Call validation first
+
 	if err := handler.ValidateCustomerFields(
 		req.CustomerNumber,
 		req.FirstName,
@@ -71,7 +68,8 @@ func (s *CustomerManagerService) CreateCustomer(ctx context.Context, req *v1.Cre
 			Message: "Validation failed for PHONE NUMBER MUST BE IN 10 DIGIT: " + err.Error(),
 		}, nil
 	}
-
+	nc,_:=connectToNATS()
+	fmt.Println("Nats Connecting............")
 	customer := &biz.Customer{
 		CustomerNumber: req.CustomerNumber,
 		FirstName:      req.FirstName,
@@ -102,9 +100,9 @@ func (s *CustomerManagerService) CreateCustomer(ctx context.Context, req *v1.Cre
 	if err!=nil{
 		return nil,fmt.Errorf("Failed:%w",err)
 	}
-	nc,_:=connectToNATS()
+	// nc,_:=connectToNATS()
 	nc.Publish("Create",data)
-
+	fmt.Println("EMail")
 	return &v1.CreateCustomerReply{
 		Message:        "Customer Created Successfully",
 		CustomerId:     c.CustomerId,

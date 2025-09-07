@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package helloworld.v1;
+
+
+import "google/protobuf/empty.proto";
+
+option go_package = "cache_service/api/helloworld/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.helloworld.v1";
+
+
+service BalanceCacheService {
+  
+  rpc GetBalance (CacheRequest) returns (CacheResponse) {}
+
+ 
+  rpc SetBalance (CacheRequest) returns (google.protobuf.Empty) {}
+
+  
+  rpc DeleteBalance (CacheRequest) returns (google.protobuf.Empty) {}
+}
+
+
+
+message CacheRequest {
+ int64 accountNumber = 1;
+int64 availableBalance = 2;
+  string currency = 4;
+}
+
+
+message CacheResponse {
+  int64 accountNumber = 3;
+int64 availableBalance = 2;
+}

@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"fmt"
 
 	v1 "message-service/api/helloworld/v1"
 	//"message-service/internal/data"
@@ -19,8 +20,8 @@ var (
 type Notification struct {
 	 CustomerNumber string
 	FirstName string
-	Email string
-	status string
+	Email string `json:"email"`
+	Status string
 
 }
 type Payment struct {
@@ -39,12 +40,9 @@ type Payment struct {
 
 // GreeterRepo is a Greater repo.
 type GreeterRepo interface {
-	Save(context.Context, *Notification) (*Notification, error)
-	Update(context.Context, *Notification) (*Notification, error)
-	FindByID(context.Context, int64) (*Notification, error)
-	ListByHello(context.Context, string) ([]*Notification, error)
-	ListAll(context.Context) ([]*Notification, error)
+	
 	PaymentNotification(context.Context,*Payment)(*Payment,error)
+	CreateNotification(context.Context,*Notification)(*Notification, error)
 }
 
 // GreeterUsecase is a Greeter usecase.
@@ -54,19 +52,20 @@ type NotificationUsecase struct {
 }
 
 
-// NewGreeterUsecase new a Greeter usecase.
+
 func NewGreeterUsecase(repo GreeterRepo, logger log.Logger) *NotificationUsecase {
 	return &NotificationUsecase{repo: repo, log: log.NewHelper(logger)}
 }
 
-// CreateGreeter creates a Greeter, and returns the new Greeter.
+
 func (uc *NotificationUsecase) CreateNotification(ctx context.Context, g *Notification) (*Notification, error) {
-	uc.log.WithContext(ctx).Infof("CreateNotification: %v", g.Email)
-	return uc.repo.Save(ctx, g)
+	fmt.Println("emsyhb",g.Email)
+	uc.log.WithContext(ctx).Infof("CreateNotification: %s", g.Email)
+	return uc.repo.CreateNotification(ctx, g)
 }
 
 
-func (uc *NotificationUsecase) PaymentNotification(ctx context.Context, g *Payment) (*Payment, error) {
-	uc.log.WithContext(ctx).Infof("PaymentNotification: %+v ",g )
-	return uc.repo.PaymentNotification(ctx, g)
-}
+// func (uc *NotificationUsecase) PaymentNotification(ctx context.Context, g *Payment) (*Payment, error) {
+// 	uc.log.WithContext(ctx).Infof("PaymentNotification: %+v ",g )
+// 	return uc.repo.PaymentNotification(ctx, g)
+// }

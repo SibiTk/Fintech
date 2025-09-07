@@ -22,12 +22,14 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// The request message containing the user's name.
 type RequestNotification struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	CustomerNumber string                 `protobuf:"bytes,1,opt,name=customer_number,json=customerNumber,proto3" json:"customer_number,omitempty"`
+	FirstName      string                 `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	Email          string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Status         string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *RequestNotification) Reset() {
@@ -60,9 +62,30 @@ func (*RequestNotification) Descriptor() ([]byte, []int) {
 	return file_api_helloworld_v1_greeter_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *RequestNotification) GetCustomerNumber() string {
+	if x != nil {
+		return x.CustomerNumber
+	}
+	return ""
+}
+
+func (x *RequestNotification) GetFirstName() string {
+	if x != nil {
+		return x.FirstName
+	}
+	return ""
+}
+
 func (x *RequestNotification) GetEmail() string {
 	if x != nil {
 		return x.Email
+	}
+	return ""
+}
+
+func (x *RequestNotification) GetStatus() string {
+	if x != nil {
+		return x.Status
 	}
 	return ""
 }
@@ -348,9 +371,13 @@ var File_api_helloworld_v1_greeter_proto protoreflect.FileDescriptor
 
 const file_api_helloworld_v1_greeter_proto_rawDesc = "" +
 	"\n" +
-	"\x1fapi/helloworld/v1/greeter.proto\x12\rhelloworld.v1\x1a\x1cgoogle/api/annotations.proto\"+\n" +
-	"\x13RequestNotification\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\"/\n" +
+	"\x1fapi/helloworld/v1/greeter.proto\x12\rhelloworld.v1\x1a\x1cgoogle/api/annotations.proto\"\x8b\x01\n" +
+	"\x13RequestNotification\x12'\n" +
+	"\x0fcustomer_number\x18\x01 \x01(\tR\x0ecustomerNumber\x12\x1d\n" +
+	"\n" +
+	"first_name\x18\x02 \x01(\tR\tfirstName\x12\x14\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\"/\n" +
 	"\x11ReplyNotification\x12\x1a\n" +
 	"\bmessages\x18\x01 \x01(\tR\bmessages\"\xf2\x02\n" +
 	"\x15RequestPaymentDetails\x12\x1d\n" +

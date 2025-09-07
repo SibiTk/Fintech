@@ -3,15 +3,15 @@
 
 openapi: 3.0.3
 info:
-    title: Card API
+    title: Transaction API
     version: 0.0.1
 paths:
     /v1/helloworld/transaction:
         post:
             tags:
-                - Card
+                - Transaction
             description: Transaction endpoints
-            operationId: Card_CreateTransaction
+            operationId: Transaction_CreateTransaction
             requestBody:
                 content:
                     application/json:
@@ -34,8 +34,8 @@ paths:
     /v1/helloworld/transaction/{transactionId}:
         get:
             tags:
-                - Card
-            operationId: Card_DisplayTransaction
+                - Transaction
+            operationId: Transaction_DisplayTransaction
             parameters:
                 - name: transactionId
                   in: path
@@ -57,8 +57,8 @@ paths:
                                 $ref: '#/components/schemas/Status'
         delete:
             tags:
-                - Card
-            operationId: Card_DeleteTransaction
+                - Transaction
+            operationId: Transaction_DeleteTransaction
             parameters:
                 - name: transactionId
                   in: path
@@ -80,8 +80,8 @@ paths:
                                 $ref: '#/components/schemas/Status'
         patch:
             tags:
-                - Card
-            operationId: Card_UpdateTransaction
+                - Transaction
+            operationId: Transaction_UpdateTransaction
             parameters:
                 - name: transactionId
                   in: path
@@ -230,4 +230,4 @@ components:
                 postingDate:
                     type: string
 tags:
-    - name: Card
+    - name: Transaction

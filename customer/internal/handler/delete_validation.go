@@ -20,7 +20,7 @@ func DeleteCustomerWithCascade(ctx context.Context, customerId int64, deleteCust
 
     accountClient := accountpb.NewAccountClient(conn)
 
-    // Delete accounts associated with customer
+  
     _, err = accountClient.DeleteAccount(ctx, &accountpb.DeleteRequest{
         CustomerId: customerId,
     })

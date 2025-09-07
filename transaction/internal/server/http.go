@@ -1,7 +1,7 @@
 package server
 
 import (
-	v1 "transaction/api/helloworld/v1"
+	v1 "transaction/api/hello/v1"
 	"transaction/internal/conf"
 	"transaction/internal/service"
 
@@ -35,6 +35,6 @@ func NewHTTPServer(c *conf.Server, greeter *service.TransactionService, logger l
 	))
 	opts = append(opts, cors)
 	srv := http.NewServer(opts...)
-	v1.RegisterCardHTTPServer(srv, greeter)
+	v1.RegisterTransactionHTTPServer(srv, greeter)
 	return srv
 }

@@ -12,8 +12,8 @@ func ValidateEmail(email string) error {
 	if atIdx <= 0  {
 		return errors.New("email must have @ symbol ")
 	}
-	if len(email) > 20 {
-		return errors.New("email is too long, max 20 characters allowed")
+	if len(email) > 100 {
+		return errors.New("email is too long, max 100 characters allowed")
 	}
 return nil
 }

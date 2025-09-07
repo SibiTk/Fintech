@@ -1,0 +1,94 @@
+func (s *TransactionService) CreateTransaction(ctx context.Context, req *v1.CreateTransactionRequest) (*v1.CreateTransactionReply, error) {
+   
+    conn, err := grpc.Dial("localhost:9013", grpc.WithTransportCredentials(insecure.NewCredentials()))
+    if err != nil {
+        return nil, fmt.Errorf("failed to connect to account service: %w", err)
+    }
+    defer conn.Close()
+
+    accountClient := accountpb.NewAccountClient(conn)
+
+
+    originResp, err := accountClient.GetAccountWithNum(ctx, &accountpb.AccountIdRequest{
+        AccountNumber: req.OrginatoryAccount_Number,
+    })
+    if err != nil {
+        return nil, fmt.Errorf("failed to fetch originator account: %w", err)
+    }
+    if len(originResp.Accounts) == 0 {
+        return nil, fmt.Errorf("originator account not found")
+    }
+    originAcct := originResp.Accounts[0]
+
+  
+    if originAcct.AvailableBalance < req.Amount {
+        return nil, fmt.Errorf("insufficient funds in originator account")
+    }
+
+ 
+    beneficiaryResp, err := accountClient.GetAccountWithNum(ctx, &accountpb.AccountIdRequest{
+        AccountNumber: req.BeneficiaryAccount_Number,
+    })
+    if err != nil {
+        return nil, fmt.Errorf("failed to fetch beneficiary account: %w", err)
+    }
+    if len(beneficiaryResp.Accounts) == 0 {
+        return nil, fmt.Errorf("beneficiary account not found")
+    }
+    beneficiaryAcct := beneficiaryResp.Accounts[0]
+
+
+    _, err = accountClient.UpdateAccount(ctx, &accountpb.UpdateRequest{
+        AccountNumber: originAcct.AccountNumber,
+        Amount:        req.Amount,
+        Operation:     "debit",
+    })
+    if err != nil {
+        return nil, fmt.Errorf("failed to debit origin account: %w", err)
+    }
+
+    
+    _, err = accountClient.UpdateAccount(ctx, &accountpb.UpdateRequest{
+        AccountNumber: beneficiaryAcct.AccountNumber,
+        Amount:        req.Amount,
+        Operation:     "credit",
+    })
+    if err != nil {
+        // Optional: roll back origin account debit here if needed
+        return nil, fmt.Errorf("failed to credit beneficiary account: %w", err)
+    }
+
+
+    transaction := &biz.Transaction{
+        TransactionId:             req.Transactionid,
+        OrginatoryAccount_Number:  req.OrginatoryAccount_Number,
+        BeneficiaryAccount_Number: req.BeneficiaryAccount_Number,
+        TransactionType:           req.TransactionType,
+        Amount:                    req.Amount,
+        Currency:                  req.Currency,
+        Status:                    req.Status,
+        Description:               req.Description,
+        ReferenceNumber:           req.ReferenceNumber,
+        PostingDate:               req.PostingDate,
+    }
+
+    t, err := s.uc.CreateTransaction(ctx, transaction)
+    if err != nil {
+        return nil, fmt.Errorf("failed to record transaction: %w", err)
+    }
+
+   
+    return &v1.CreateTransactionReply{
+        Message:                   "Transaction processed successfully",
+        TransactionId:             t.TransactionId,
+        OrginatoryAccount_Number:  t.OrginatoryAccount_Number,
+        BeneficiaryAccount_Number: t.BeneficiaryAccount_Number,
+        TransactionType:           t.TransactionType,
+        Amount:                    int64(t.Amount),
+        Currency:                  t.Currency,
+        Status:                    t.Status,
+        Description:               t.Description,
+        ReferenceNumber:           t.ReferenceNumber,
+        PostingDate:               t.PostingDate,
+    }, nil
+}

@@ -7,7 +7,7 @@ import (
 	"unicode"
 )
 
-// Checks that the value consists only of letters and spaces.
+
 func isAlphaSpace(s string) bool {
 	for _, r := range s {
 		if !(unicode.IsLetter(r) || r == ' ') {

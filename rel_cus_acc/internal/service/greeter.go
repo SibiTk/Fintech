@@ -9,7 +9,7 @@ import (
     v1 "rel_cus_acc/api/helloworld/v1"
     "rel_cus_acc/internal/biz"
     
-    // Import proto files for other services
+   
     accountpb "account/api/helloworld/v1"
     customerpb "customer/api/helloworld/v1"
     

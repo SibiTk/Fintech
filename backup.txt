@@ -1,135 +1,102 @@
-package service
-
-import (
-	"context"
-	"fmt"
-	"log"
-
-	v1 "payment/api/helloworld/v1"
-	"payment/internal/biz"
-	//"payment/internal/client"
-
-	accountpb "account/api/helloworld/v1"
-	cu "customer/api/helloworld/v1"
-
-	"github.com/nats-io/nats.go"
-)
-
-type PaymentService struct {
-	AccountClient  accountpb.AccountClient
-	CustomerClient cu.CustomerManagerClient
-	v1.UnimplementedPaymentServer
-	uc *biz.PaymentUsecase
-}
-
-type PaymentStatus struct {
-	FromEmail     string
-	ToEmail       string
-	FromBalance   int64
-	ToBalance     int64
-	FromFirstName string
-	ToFirstName   string
-	Amount        int64
-	AccountNumber int64
-}
-
-func NewPaymentService(uc *biz.PaymentUsecase, accClient accountpb.AccountClient, cusClient cu.CustomerManagerClient) *PaymentService {
-	return &PaymentService{uc: uc, AccountClient: accClient, CustomerClient: cusClient}
-}
-
-func connectToNats() (*nats.Conn, error) {
-	return nats.Connect(nats.DefaultURL)
-}
-
-func (s *PaymentService) CreatePayment(ctx context.Context, req *v1.CreatePaymentRequest) (*v1.CreatePaymentReply, error) {
-	payment := &biz.Payment{
-		PaymentId:         req.PaymentId,
-		FromAccountId:     req.FromAccountId,
-		ToAccountId:       req.ToAccountId,
-		PaymentType:       req.PaymentType,
-		Amount:            int64(req.Amount),
-		Currency:          req.Currency,
-		Status:            req.Status,
-		PaymentMethod:     req.PaymentMethod,
-		ReferenceNumber:   req.ReferenceNumber,
-		ExternalReference: req.ExternalReference,
-	}
-
-	p, err := s.uc.CreatePayment(ctx, payment)
+func (s *TransactionService) CreateTransaction(ctx context.Context, req *v1.CreateTransactionRequest) (*v1.CreateTransactionReply, error) {
+	conn, err := grpc.Dial("localhost:9013", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to connect to account service: %w", err)
 	}
+	defer conn.Close()
+	accountClient := accountpb.NewAccountClient(conn)
 
-	fromResp, err := s.AccountClient.GetAccountWithId(ctx, &accountpb.AccountIdRequest{AccountId: req.FromAccountId})
-	if err != nil {
-		log.Println("Invalid FromAccount")
-		return nil, err
-	}
-	if len(fromResp.Accounts) == 0 {
-		return nil, fmt.Errorf("no account found for FromAccountId: %v", req.FromAccountId)
-	}
-	fromAcc := fromResp.Accounts[0]
-
-	toResp, err := s.AccountClient.GetAccountWithId(ctx, &accountpb.AccountIdRequest{AccountId: req.ToAccountId})
-	if err != nil {
-		log.Println("Invalid ToAccount")
-		return nil, err
-	}
-	if len(toResp.Accounts) == 0 {
-		return nil, fmt.Errorf("no account found for ToAccountId: %v", req.ToAccountId)
-	}
-	toAcc := toResp.Accounts[0]
-
-	if fromAcc.AvailableBalance < int64(req.Amount) {
-		return nil, fmt.Errorf("insufficient funds in the from account")
-	}
-
-	newFromBalance := fromAcc.AvailableBalance - int64(req.Amount)
-	newToBalance := toAcc.AvailableBalance + int64(req.Amount)
-    fmt.Println("New From balance : ",newFromBalance)
-	 fmt.Println("New To balance : ",newToBalance)
-	_, err = s.AccountClient.UpdateAccount(ctx, &accountpb.UpdateRequest{
-		CustomerId: fromAcc.CustomerId,
-		AccountType: fromAcc.AccountType,
-		Status: fromAcc.Status,
+	// Fetch origin account
+	originAcctResp, err := accountClient.GetAccountWithNum(ctx, &accountpb.AccountIdRequest{
+		AccountNumber: req.OrginatoryAccount_Number,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch originator account: %w", err)
+	}
+	if len(originAcctResp.Accounts) == 0 {
+		return nil, fmt.Errorf("originator account not found")
+	}
+	originAcct := originAcctResp.Accounts[0]
+
+	
+	if originAcct.AvailableBalance < req.Amount {
+		return nil, fmt.Errorf("insufficient funds in originator account")
 	}
 
-	_, err = s.AccountClient.UpdateAccount(ctx, &accountpb.UpdateRequest{
-		CustomerId: toAcc.CustomerId,
-		AccountType: toAcc.AccountType,
-		Status: toAcc.Status,
+	
+	beneficiaryAcctResp, err := accountClient.GetAccountWithNum(ctx, &accountpb.AccountIdRequest{
+		AccountNumber: req.BeneficiaryAccount_Number,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch beneficiary account: %w", err)
 	}
+	if len(beneficiaryAcctResp.Accounts) == 0 {
+		return nil, fmt.Errorf("beneficiary account not found")
+	}
+	beneficiaryAcct := beneficiaryAcctResp.Accounts[0]
 
-	fromCus, err := s.CustomerClient.DisplayCustomer(ctx, &cu.FindCustomerByIdRequest{CustomerId: fromAcc.CustomerId})
+	// Update balances
+	originNewBal := originAcct.AvailableBalance - req.Amount
+	beneficiaryNewBal := beneficiaryAcct.AvailableBalance + req.Amount
+
+	_, err = accountClient.UpdateAccount(ctx, &accountpb.UpdateRequest{
+		AccountId:        originAcct.AccountId,
+		CustomerId:       originAcct.CustomerId,
+		AccountNumber:    originAcct.AccountNumber,
+		AccountType:      originAcct.AccountType,
+		Currency:         originAcct.Currency,
+		Status:           originAcct.Status,
+		AvailableBalance: originNewBal,
+		PendingBalance:   originAcct.PendingBalance,
+		CreditLimit:      originAcct.CreditLimit,
+	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update origin account balance: %w", err)
 	}
-
-	toCus, err := s.CustomerClient.DisplayCustomer(ctx, &cu.FindCustomerByIdRequest{CustomerId: toAcc.CustomerId})
+	_, err = accountClient.UpdateAccount(ctx, &accountpb.UpdateRequest{
+		AccountId:        beneficiaryAcct.AccountId,
+		CustomerId:       beneficiaryAcct.CustomerId,
+		AccountNumber:    beneficiaryAcct.AccountNumber,
+		AccountType:      beneficiaryAcct.AccountType,
+		Currency:         beneficiaryAcct.Currency,
+		Status:           beneficiaryAcct.Status,
+		AvailableBalance: beneficiaryNewBal,
+		PendingBalance:   beneficiaryAcct.PendingBalance,
+		CreditLimit:      beneficiaryAcct.CreditLimit,
+	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update beneficiary account balance: %w", err)
 	}
 
-	_ = fromCus
-	_ = toCus
+	// Store transaction
+	transaction := &biz.Transaction{
+		TransactionId:             req.Transactionid,
+		OrginatoryAccount_Number:  req.OrginatoryAccount_Number,
+		BeneficiaryAccount_Number: req.BeneficiaryAccount_Number,
+		TransactionType:           req.TransactionType,
+		Amount:                    req.Amount,
+		Currency:                  req.Currency,
+		Status:                    req.Status,
+		Description:               req.Description,
+		ReferenceNumber:           req.ReferenceNumber,
+		PostingDate:               req.PostingDate,
+	}
+	t, err := s.uc.CreateTransaction(ctx, transaction)
+	if err != nil {
+		return nil, fmt.Errorf("failed to record transaction: %w", err)
+	}
 
-	return &v1.CreatePaymentReply{
-		PaymentId:         p.PaymentId,
-		FromAccountId:     p.FromAccountId,
-		ToAccountId:       p.ToAccountId,
-		PaymentType:       p.PaymentType,
-		Amount:            float64(p.Amount),
-		Currency:          p.Currency,
-		Status:            p.Status,
-		PaymentMethod:     p.PaymentMethod,
-		ReferenceNumber:   p.ReferenceNumber,
-		ExternalReference: p.ExternalReference,
-		Message:           "Payment Details are stored",
+	return &v1.CreateTransactionReply{
+		Message:                   "Transaction processed: balances updated, transaction stored",
+		TransactionId:             t.TransactionId,
+		OrginatoryAccount_Number:  t.OrginatoryAccount_Number,
+		BeneficiaryAccount_Number: t.BeneficiaryAccount_Number,
+		TransactionType:           t.TransactionType,
+		Amount:                    int64(t.Amount),
+		Currency:                  t.Currency,
+		Status:                    t.Status,
+		Description:               t.Description,
+		ReferenceNumber:           t.ReferenceNumber,
+		PostingDate:               t.PostingDate,
 	}, nil
 }

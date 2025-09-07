@@ -98,9 +98,14 @@ components:
         RequestNotification:
             type: object
             properties:
+                customerNumber:
+                    type: string
+                firstName:
+                    type: string
                 email:
                     type: string
-            description: The request message containing the user's name.
+                status:
+                    type: string
         RequestPaymentDetails:
             type: object
             properties:

@@ -7,12 +7,14 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 )
 
-
+// var (
+// 	ErrTransactionNotFound = errors.NotFound(v1.ErrorReason_USER_NOT_FOUND.String(), "transaction not found")
+// )
 
 type Transaction struct {
 	TransactionId        int64   `gorm:"column:transaction_id;type:bigint;primaryKey"`
-	AccountId           int64  `gorm:"column:account_id;type:varchar"`
-	RelatedTransactionId int64 `gorm:"column:related_transaction_id;type:varchar"`
+	AccountId           int64  `gorm:"column:account_id;type:bigint"`
+	RelatedTransactionId int64  `gorm:"column:related_transaction_id;type:bigint"`
 	TransactionType     string  `gorm:"column:transaction_type;type:varchar"`
 	Amount              float64 `gorm:"column:amount;type:numeric(20,4)"`
 	Currency            string  `gorm:"column:currency;type:varchar(3)"`
@@ -20,6 +22,7 @@ type Transaction struct {
 	Description         string  `gorm:"column:description;type:text"`
 	ReferenceNumber     string  `gorm:"column:reference_number;type:varchar"`
 	PostingDate         string  `gorm:"column:posting_date;type:varchar"`
+	
 }
 
 type TransactionRepo interface {

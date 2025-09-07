@@ -1,7 +1,7 @@
 syntax = "proto3";
 package kratos.api;
 
-option go_package = "accountservice/internal/conf;conf";
+option go_package = "customermanager/internal/conf;conf";
 
 import "google/protobuf/duration.proto";
 
@@ -35,6 +35,8 @@ message Data {
     string addr = 2;
     google.protobuf.Duration read_timeout = 3;
     google.protobuf.Duration write_timeout = 4;
+    string password = 5;     
+    int32 db = 6;  
   }
   Database database = 1;
   Redis redis = 2;

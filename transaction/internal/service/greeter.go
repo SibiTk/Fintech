@@ -3,12 +3,12 @@ package service
 import (
 	"context"
 
-	v1 "transaction/api/helloworld/v1"
+	v1 "transaction/api/hello/v1"
 	"transaction/internal/biz"
 )
 
 type TransactionService struct {
-	v1.UnimplementedCardServer
+	v1.UnimplementedTransactionServer
 	uc *biz.TransactionUsecase
 }
 

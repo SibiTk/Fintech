@@ -1,7 +1,7 @@
 package server
 
 import (
-	v1 "transaction/api/helloworld/v1"
+	v1 "transaction/api/hello/v1"
 	"transaction/internal/conf"
 	"transaction/internal/service"
 
@@ -27,6 +27,6 @@ func NewGRPCServer(c *conf.Server, greeter *service.TransactionService, logger l
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	v1.RegisterCardServer(srv, greeter)
+	v1.RegisterTransactionServer(srv, greeter)
 	return srv
 }

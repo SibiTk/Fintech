@@ -27,7 +27,7 @@ func (r *PaymentRepo) Create(ctx context.Context, p *biz.Payment) (*biz.Payment,
 		r.log.WithContext(ctx).Error("payment_id is zero")
 		return nil, gorm.ErrInvalidData
 	}
-	// Validate required fields
+	
 	if p.FromAccountId == 0 || p.ToAccountId == 0 || p.PaymentType == "" || p.Amount == 0 || p.Currency == "" || p.Status == "" || p.PaymentMethod == "" {
 		r.log.WithContext(ctx).Error("required fields are missing")
 		return nil, gorm.ErrInvalidData
